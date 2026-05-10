@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main] # Se déclenche à chaque push sur main
+    branches: [main]
 
 permissions:
   contents: read
@@ -15,9 +15,22 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Install, build, and upload Astro
-        uses: withastro/action@v3
-        # Pas besoin de configurer node ou npm, l'action s'en occupe
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 # On force la version 22 réclamée par Astro
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Astro
+        run: npm run build
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist # Astro génère le site dans le dossier dist
 
   deploy:
     needs: build
